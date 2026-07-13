@@ -20,7 +20,6 @@ export default async function ProfilePage() {
       </header>
 
       <div className="flex-1 overflow-y-auto pb-24">
-        {/* Аватар, Имя и кнопка вызова Модалки настроек */}
         <div className="p-8 flex flex-col items-center border-b border-gray-50">
           <div className="w-32 h-32 rounded-full border-4 border-white shadow-xl overflow-hidden bg-gray-200">
              <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${user.id}`} className="w-full h-full object-cover" alt="Avatar" />
@@ -35,7 +34,6 @@ export default async function ProfilePage() {
           <EditProfileModal user={user} />
         </div>
 
-        {/* Блок аккуратного вывода информации о пользователе */}
         <div className="p-6 space-y-6">
           <div className="space-y-1.5">
             <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider">О себе</h4>

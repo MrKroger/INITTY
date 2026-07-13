@@ -1,7 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-    experimental: {//Отключение блокировки действий
+    experimental: {
         serverActions:{
             allowedOrigins:[
                 "localhost:3000",
