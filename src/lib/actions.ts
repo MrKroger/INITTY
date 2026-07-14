@@ -263,6 +263,10 @@ export async function handleEventApplication(applicationId: string, status: "app
   await db.update(eventApplications)
     .set({ status })
     .where(eq(eventApplications.id, applicationId));
+  
+  await db.update(notifications)
+    .set({ isRead: true })
+    .where(eq(notifications.id, applicationId));
 
   if (status === "approved") {
     let chat = await db.query.chats.findFirst({
@@ -304,6 +308,7 @@ export async function handleEventApplication(applicationId: string, status: "app
   }
 
   revalidatePath("/profile");
+  revalidatePath("/notifications");
 }
 
 export async function addBoardItem(eventId: string, content: string) {

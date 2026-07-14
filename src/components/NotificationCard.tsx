@@ -10,6 +10,7 @@ interface NotificationCardProps {
     type: string;
     isRead: boolean;
     eventId: string | null;
+    applicationStatus?: string | null;
     fromUser?: {
       name: string;
     } | null;
@@ -23,7 +24,11 @@ export function NotificationCard({ notification }: NotificationCardProps) {
   const cardRef = useRef<HTMLDivElement>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
-  const [statusAction, setStatusAction] = useState<"approved" | "rejected" | null>(null);
+  const [statusAction, setStatusAction] = useState<"approved" | "rejected" | null>(
+    notification.applicationStatus === "approved" || notification.applicationStatus === "rejected"
+      ? notification.applicationStatus
+      : null
+  );
 
   useEffect(() => {
     if (notification.isRead) return;
