@@ -29,37 +29,26 @@ async function decrypt(token: string) {
 
 export async function getSession() {
   const sessionCookie = (await cookies()).get("session_id");
-  
-  console.log("--- [AUTH DEBUG] ---");
-  console.log("1. Найдена кука session_id:", sessionCookie ? "ДА" : "НЕТ");
-  
+    
   if (!sessionCookie) {
     console.log("Выход: Куки нет");
     return null;
   }
 
-  console.log("2. Сырое значение куки:", sessionCookie.value.substring(0, 20) + "...");
-
   // Пробуем расшифровать
   const payload = await decrypt(sessionCookie.value);
-  console.log("3. Результат расшифровки payload:", payload);
 
   if (!payload || !payload.userId) {
-    console.log("Выход: Не удалось расшифровать токен или userId пуст");
     return null;
   }
-
-  console.log("4. Ищем пользователя в БД с ID:", payload.userId);
 
   try {
     const user = await db.query.users.findFirst({
       where: eq(users.id, payload.userId),
     });
 
-    console.log("5. Пользователь найден в БД?:", user ? `ДА (${user.name})` : "НЕТ");
     return user;
   } catch (dbError) {
-    console.error("ОШИБКА ПРИ ЗАПРОСЕ К БД в getSession:", dbError);
     return null;
   }
 }
