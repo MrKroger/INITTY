@@ -7,13 +7,46 @@ import {
   chatParticipants, 
 } from "@/db/schema";
 import { getSession } from "@/lib/auth";
-import { and, eq, inArray } from "drizzle-orm";
+import { and, eq, inArray, sql } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
+
+const MAX_SWIPES_PER_MINUTE = 40;
 
 export async function swipe(toUserId: string, type: "like" | "pass") {
   const session = await getSession();
   if (!session) throw new Error("Unauthorized");
 
+  const oneMinuteAgo = new Date(Date.now() - 60 * 1000);
+
+  const [result] = await db
+    .select({ count: sql<number>`count(*)` })
+    .from(swipes)
+    .where(
+      and(
+        eq(swipes.fromUserId, session.id),
+        sql`${swipes.createdAt} > ${oneMinuteAgo}`
+      )
+    );
+
+  const swipeCount = Number(result?.count || 0);
+
+  if (swipeCount >= MAX_SWIPES_PER_MINUTE) {
+    throw new Error("Вы свайпаете слишком быстро! Пожалуйста, подождите немного.");
+  }
+
+  // --- ПРЕДОТВРАЩЕНИЕ ДУБЛИКАТОВ СВАЙПОВ ---
+  // Проверяем, не свайпали ли мы этого пользователя уже ранее
+  const existingSwipe = await db.query.swipes.findFirst({
+    where: and(
+      eq(swipes.fromUserId, session.id),
+      eq(swipes.toUserId, toUserId)
+    )
+  });
+
+  if (existingSwipe) {
+    return { match: false, error: "Вы уже оценили этого пользователя" };
+  }
+  
   await db.insert(swipes).values({
     fromUserId: session.id,
     toUserId,
@@ -30,16 +63,7 @@ export async function swipe(toUserId: string, type: "like" | "pass") {
     });
 
     if (mutualLike) {
-      const existingChat = await db.query.chats.findFirst({
-        where: eq(chats.type, "direct"),
-      });
-
-      const isAlreadyConnected = await db.query.chatParticipants.findFirst({
-        where: and(
-          eq(chatParticipants.userId, session.id),
-        )
-      });
-
+      // Ищем существующий диалог между этими двумя пользователями
       const allUserChats = await db.query.chatParticipants.findMany({
         where: eq(chatParticipants.userId, session.id),
       });
@@ -60,6 +84,7 @@ export async function swipe(toUserId: string, type: "like" | "pass") {
         return { match: true };
       }
 
+      // Если чата нет — создаем новый
       const [newChat] = await db.insert(chats).values({
         type: "direct",
       }).returning();
@@ -74,5 +99,7 @@ export async function swipe(toUserId: string, type: "like" | "pass") {
 
     revalidatePath("/");
     return { match: false };
-  }
+    }
+
+    return { match: false };
 }
