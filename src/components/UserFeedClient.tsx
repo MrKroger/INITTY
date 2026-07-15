@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { SwipeCard } from "./SwipeCard";
-import { swipe } from "@/lib/actions";
+import { swipe } from "@/lib/actions/swipe";
 import { Heart, X } from "lucide-react";
 
 export function UserFeedClient({ initialUsers }: { initialUsers: any[] }) {

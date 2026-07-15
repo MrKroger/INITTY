@@ -5,7 +5,7 @@ import { eq, desc } from "drizzle-orm";
 import { notFound, redirect } from "next/navigation";
 import { ArrowLeft, MessageCircle, Send } from "lucide-react";
 import Link from "next/link";
-import { addBoardItem } from "@/lib/actions";
+import { addBoardItem } from "@/lib/actions/addBoardItem";
 
 export default async function EventBoardPage({ params }: { params: { id: string } }) {
   const { id } = await params;

@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Plus } from "lucide-react";
 import { desc } from "drizzle-orm";
 import { cn } from "@/lib/utils";
-import { applyToEvent } from "@/lib/actions";
+import { applyToEvent } from "@/lib/actions/applyToEvent";
 
 export default async function EventsPage() {
   const session = await getSession();

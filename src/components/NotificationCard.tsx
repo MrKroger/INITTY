@@ -2,7 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Check, X as Close } from "lucide-react";
-import { markNotificationAsRead, handleEventApplication } from "@/lib/actions";
+import { markNotificationAsRead } from "@/lib/actions/markNotificationAsRead";
+import { handleEventApplication  } from "@/lib/actions/handleEventApplication";
 
 interface NotificationCardProps {
   notification: {

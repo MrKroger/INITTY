@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Settings, X, Check, Hash } from "lucide-react";
-import { updateProfileData } from "@/lib/actions";
+import { updateProfileData } from "@/lib/actions/updateProfileData";
 
 interface EditProfileModalProps {
   user: {
