@@ -3,14 +3,18 @@
 import { useState } from "react";
 import { X, School, Award, Hash, GraduationCap } from "lucide-react";
 import { completeOnboarding } from "@/lib/actions";
+import { useRouter } from "next/navigation";
 
 export default function OnboardingPage() {
+  const router = useRouter();
   const [university, setUniversity] = useState("");
   const [faculty, setFaculty] = useState("");
   const [isGraduated, setIsGraduated] = useState(false);
   const [course, setCourse] = useState("");
   const [hobbies, setHobbies] = useState<string[]>([]);
   const [hobbyInput, setHobbyInput] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [isPending, setIsPending] = useState(false);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" || e.key === ",") {
@@ -32,6 +36,30 @@ export default function OnboardingPage() {
     (isGraduated || (faculty.trim() && course)) && 
     hobbies.length > 0;
 
+  // Безопасный обработчик отправки формы через клиент
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!isValid || isPending) return;
+
+    setIsPending(true);
+    setError(null);
+
+    try {
+      const formData = new FormData(e.currentTarget);
+      // Принудительно передаем hobbies в FormData, так как это массив в стейте
+      formData.set("hobbies", JSON.stringify(hobbies));
+
+      await completeOnboarding(formData);
+      // После успешного онбординга делаем жесткий реверс роутера для обновления сессии
+      router.push("/");
+      router.refresh();
+    } catch (err: any) {
+      setError(err.message || "Что-то пошло не так. Попробуйте снова.");
+    } finally {
+      setIsPending(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col justify-center px-4 py-8 text-black">
       <div className="mx-auto w-full max-w-md bg-white p-6 rounded-2xl shadow-md border border-gray-100 space-y-6">
@@ -40,8 +68,13 @@ export default function OnboardingPage() {
           <p className="text-xs text-gray-500 mt-1">Без этого мы не сможем подобрать тебе идеальное окружение</p>
         </div>
 
-        <form action={completeOnboarding} className="space-y-4">
+        {error && (
+          <div className="bg-red-50 border border-red-100 text-red-600 text-xs p-3 rounded-xl text-center font-medium">
+            {error}
+          </div>
+        )}
 
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-xs font-semibold text-gray-600 mb-1">Университет *</label>
             <div className="relative">
@@ -128,16 +161,14 @@ export default function OnboardingPage() {
             </div>
           </div>
 
-          <input type="hidden" name="hobbies" value={JSON.stringify(hobbies)} />
-
           <button
             type="submit"
-            disabled={!isValid}
+            disabled={!isValid || isPending}
             className={`w-full py-2.5 rounded-xl font-medium text-sm text-white transition-all ${
-              isValid ? "bg-indigo-600 hover:bg-indigo-700 cursor-pointer" : "bg-gray-300 cursor-not-allowed"
+              isValid && !isPending ? "bg-indigo-600 hover:bg-indigo-700 cursor-pointer" : "bg-gray-300 cursor-not-allowed"
             }`}
           >
-            Войти на сайт
+            {isPending ? "Сохранение..." : "Войти на сайт"}
           </button>
         </form>
       </div>
