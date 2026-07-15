@@ -34,8 +34,6 @@ export async function swipe(toUserId: string, type: "like" | "pass") {
     throw new Error("Вы свайпаете слишком быстро! Пожалуйста, подождите немного.");
   }
 
-  // --- ПРЕДОТВРАЩЕНИЕ ДУБЛИКАТОВ СВАЙПОВ ---
-  // Проверяем, не свайпали ли мы этого пользователя уже ранее
   const existingSwipe = await db.query.swipes.findFirst({
     where: and(
       eq(swipes.fromUserId, session.id),
@@ -63,7 +61,6 @@ export async function swipe(toUserId: string, type: "like" | "pass") {
     });
 
     if (mutualLike) {
-      // Ищем существующий диалог между этими двумя пользователями
       const allUserChats = await db.query.chatParticipants.findMany({
         where: eq(chatParticipants.userId, session.id),
       });
@@ -84,7 +81,6 @@ export async function swipe(toUserId: string, type: "like" | "pass") {
         return { match: true };
       }
 
-      // Если чата нет — создаем новый
       const [newChat] = await db.insert(chats).values({
         type: "direct",
       }).returning();
