@@ -1,5 +1,5 @@
 import { db } from "@/db";
-import { users, swipes } from "@/db/schema";
+import { users, swipes, type User } from "@/db/schema";
 import { getSession } from "@/lib/auth";
 import { notInArray, eq, and, sql, inArray } from "drizzle-orm";
 import { UserFeedClient } from "@/components/UserFeedClient";
@@ -18,6 +18,11 @@ function areFacultiesAdjacent(f1: string = "", f2: string = ""): boolean {
     keywords.some(k => fac1.includes(k)) && keywords.some(k => fac2.includes(k));
 
   return check(tech) || check(creative) || check(hum);
+}
+
+export interface FeedUser extends User {
+  score?: number;
+  isLiker?: boolean;
 }
 
 export default async function FeedPage() {
@@ -60,10 +65,11 @@ export default async function FeedPage() {
   });
 
   const sortedCommonUsers = commonUsers
-    .map((targetUser) => {
+    .map((targetUser: User) => { // 👈 Указываем, что это базовый User
       let score = 0;
 
-      if ((targetUser as any).track && (currentUser as any).track && (targetUser as any).track === (currentUser as any).track) {
+      // Без "as any" — всё строго типизировано!
+      if (targetUser.track && currentUser.track && targetUser.track === currentUser.track) {
         score += 30;
       } else if (areFacultiesAdjacent(targetUser.faculty || "", currentUser.faculty || "")) {
         score += 15; 
@@ -83,8 +89,8 @@ export default async function FeedPage() {
           score += 12;
         }
       }
-      
-      if ((targetUser as any).purpose && (currentUser as any).purpose && (targetUser as any).purpose === (currentUser as any).purpose) {
+
+      if (targetUser.purpose && currentUser.purpose && targetUser.purpose === currentUser.purpose) {
         score += 15;
       }
 
@@ -93,8 +99,7 @@ export default async function FeedPage() {
       }
 
       return { ...targetUser, score };
-    })
-    .sort((a, b) => a.score - b.score);
+    }).sort((a, b) => a.score - b.score);
 
   const potentialMatches = [
     ...sortedCommonUsers.map(u => ({ ...u, isLiker: false })),

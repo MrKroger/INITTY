@@ -1,5 +1,5 @@
 import { pgTable, text, timestamp, uuid, boolean, integer } from "drizzle-orm/pg-core";
-import { relations } from "drizzle-orm";
+import { relations, type InferSelectModel } from "drizzle-orm";
 
 export const users = pgTable("users", {
   id: uuid("id").defaultRandom().primaryKey(),
@@ -18,6 +18,8 @@ export const users = pgTable("users", {
   track: text("track"),
   purpose: text("purpose"),
 });
+
+export type User = InferSelectModel<typeof users>;
 
 export const swipes = pgTable("swipes", {
   id: uuid("id").defaultRandom().primaryKey(),

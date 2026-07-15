@@ -3,21 +3,10 @@
 import { motion, PanInfo, useMotionValue, useTransform, AnimatePresence } from "framer-motion";
 import { useState } from "react";
 import { Heart, X, Info } from "lucide-react";
-import { style } from "framer-motion/client";
-
-interface User {
-  id: string;
-  name: string;
-  university: string;
-  faculty: string;
-  bio: string;
-  imageUrl: string;
-  isLiker?: boolean;
-  hobbies?: string[];
-}
+import { type FeedUser } from "@/app/(main)/page"; 
 
 interface SwipeCardProps {
-  user: User;
+  user: FeedUser;
   onSwipe: (direction: "left" | "right") => void;
   zIndex?: number;
 }
@@ -55,6 +44,7 @@ export function SwipeCard({ user, onSwipe, zIndex }: SwipeCardProps) {
     >
       <div className="relative w-full h-full bg-white rounded-3xl overflow-hidden shadow-xl border border-gray-100">
         <img
+          // 3. Безопасный fallback для картинки, если imageUrl равен null
           src={user.imageUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.id}`}
           alt={user.name}
           className="w-full h-full object-cover pointer-events-none"
@@ -116,7 +106,10 @@ export function SwipeCard({ user, onSwipe, zIndex }: SwipeCardProps) {
           <div className="flex items-center justify-between">
             <div className="flex-1 mr-2">
               <h2 className="text-3xl font-bold truncate">{user.name}</h2>
-              <p className="text-sm opacity-90 truncate">{user.university} • {user.faculty}</p>
+              {/* 4. Безопасный вывод факультета и вуза с дефолтными значениями, если они равны null */}
+              <p className="text-sm opacity-90 truncate">
+                {user.university || "ВУЗ не указан"} • {user.faculty || "Факультет не указан"}
+              </p>
   
               {user.hobbies && user.hobbies.length > 0 && (
                 <div className="flex flex-wrap gap-1 mt-1.5">
