@@ -84,7 +84,6 @@ export default async function FeedPage() {
         }
       }
       
-      //Целей как таковых еще нет
       if ((targetUser as any).purpose && (currentUser as any).purpose && (targetUser as any).purpose === (currentUser as any).purpose) {
         score += 15;
       }
