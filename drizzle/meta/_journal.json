@@ -8,6 +8,13 @@
       "when": 1783811144267,
       "tag": "0000_smart_gargoyle",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1784149184092,
+      "tag": "0001_powerful_mysterio",
+      "breakpoints": true
     }
   ]
 }

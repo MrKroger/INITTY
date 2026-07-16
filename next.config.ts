@@ -6,7 +6,8 @@ const nextConfig: NextConfig = {
             allowedOrigins:[
                 "localhost:3000",
                 "*.local",
-            ]
+            ],
+            bodySizeLimit: "8mb",
         }
     }
 };

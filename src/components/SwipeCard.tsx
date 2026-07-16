@@ -44,8 +44,7 @@ export function SwipeCard({ user, onSwipe, zIndex }: SwipeCardProps) {
     >
       <div className="relative w-full h-full bg-white rounded-3xl overflow-hidden shadow-xl border border-gray-100">
         <img
-          // 3. Безопасный fallback для картинки, если imageUrl равен null
-          src={user.imageUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.id}`}
+          src={user.avatarId || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.id}`}
           alt={user.name}
           className="w-full h-full object-cover pointer-events-none"
         />

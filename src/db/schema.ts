@@ -1,5 +1,16 @@
-import { pgTable, text, timestamp, uuid, boolean, integer } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, uuid, boolean, integer, json } from "drizzle-orm/pg-core";
 import { relations, type InferSelectModel } from "drizzle-orm";
+
+export const uploads = pgTable("uploads", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  key: text("key").notNull(),
+  bucket: text("bucket").notNull(),
+  mimeType: text("mime_type").notNull(),
+  size: integer("size").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export type Upload = InferSelectModel<typeof uploads>;
 
 export const users = pgTable("users", {
   id: uuid("id").defaultRandom().primaryKey(),
@@ -10,9 +21,8 @@ export const users = pgTable("users", {
   faculty: text("faculty"),
   isGraduated: boolean("is_graduated").default(false),
   course: integer("course"),
-  hobbies: text("hobbies").array(),
-  bio: text("bio"),
-  imageUrl: text("image_url"),
+  hobbies: json("user_hobbies").$type<string[]>(),  bio: text("bio"),
+  avatarId: uuid("avatar_id").references(() => uploads.id, { onDelete: "set null" }),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   isOnboarded: boolean("is_onboarded").default(false),
   track: text("track"),
@@ -86,13 +96,25 @@ export const eventBoardItems = pgTable("event_board_items", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
-export const userRelations = relations(users, ({ many }) => ({
+export const userRelations = relations(users, ({ many, one }) => ({
   swipes: many(swipes, { relationName: "fromUser" }),
   receivedSwipes: many(swipes, { relationName: "toUser" }),
   events: many(events),
   applications: many(eventApplications),
   chatParticipants: many(chatParticipants),
   notifications: many(notifications, { relationName: "targetUser" }),
+  
+  avatar: one(uploads, {
+    fields: [users.avatarId],
+    references: [uploads.id],
+  }),
+}));
+
+export const uploadRelations = relations(uploads, ({ one }) => ({
+  user: one(users, {
+    fields: [uploads.id],
+    references: [users.avatarId],
+  }),
 }));
 
 export const swipeRelations = relations(swipes, ({ one }) => ({

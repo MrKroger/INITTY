@@ -1,8 +1,12 @@
 import { cookies } from "next/headers";
 import { db } from "@/db";
-import { users } from "@/db/schema";
+import { users, type User, type Upload } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { SignJWT, jwtVerify } from "jose";
+
+export type UserWithAvatar = User & {
+  avatar: Upload | null;
+};
 
 const JWT_SECRET = new TextEncoder().encode(
   process.env.JWT_SECRET || "default-fallback-secret-key-make-sure-to-set-env"
@@ -27,7 +31,7 @@ async function decrypt(token: string) {
   }
 }
 
-export async function getSession() {
+export async function getSession(): Promise<UserWithAvatar | null> {
   const sessionCookie = (await cookies()).get("session_id");
     
   if (!sessionCookie) {
@@ -43,12 +47,18 @@ export async function getSession() {
   }
 
   try {
+    // ⚡️ ИЗМЕНЕНО: добавляем свойство `with`, чтобы подтянуть связь 'avatar'
     const user = await db.query.users.findFirst({
       where: eq(users.id, payload.userId),
+      with: {
+        avatar: true, // Инструктирует Drizzle автоматически присоединить данные файла
+      },
     });
 
-    return user;
+    // Возвращаем пользователя с кастомным приведением типа для полной уверенности TypeScript
+    return (user as UserWithAvatar) || null;
   } catch (dbError) {
+    console.error("Ошибка при получении сессии из БД:", dbError);
     return null;
   }
 }

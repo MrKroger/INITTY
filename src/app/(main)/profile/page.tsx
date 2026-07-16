@@ -3,6 +3,8 @@ import { redirect } from "next/navigation";
 import { LogOut } from "lucide-react";
 import { logout } from "@/lib/auth";
 import EditProfileModal from "@/components/EditProfileModal";
+// ⚡️ ДОБАВЛЕНО: Импортируем наш новый интерактивный аватар
+import EditableAvatar from "@/components/EditableAvatar"; 
 
 export default async function ProfilePage() {
   const user = await getSession();
@@ -21,9 +23,15 @@ export default async function ProfilePage() {
 
       <div className="flex-1 overflow-y-auto pb-24">
         <div className="p-8 flex flex-col items-center border-b border-gray-50">
-          <div className="w-32 h-32 rounded-full border-4 border-white shadow-xl overflow-hidden bg-gray-200">
-             <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${user.id}`} className="w-full h-full object-cover" alt="Avatar" />
-          </div>
+          
+          {/* ⚡️ ИЗМЕНЕНИЕ: Заменили старый статичный <div> с <img> на наш интерактивный EditableAvatar */}
+          <EditableAvatar 
+            userId={user.id} 
+            // Передаем связанные данные об аватаре (объект из таблицы uploads)
+            // Если привязанного аватара нет, Drizzle вернет null
+            initialAvatar={user.avatar || null} 
+          />
+
           <h2 className="mt-4 text-2xl font-bold">{user.name}</h2>
           <p className="text-sm text-gray-500 font-medium mt-1">
             {user.university || "ВУЗ не указан"} 
