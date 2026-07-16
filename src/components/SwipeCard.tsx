@@ -4,6 +4,7 @@ import { motion, PanInfo, useMotionValue, useTransform, AnimatePresence } from "
 import { useState } from "react";
 import { Heart, X, Info } from "lucide-react";
 import { type FeedUser } from "@/app/(main)/page"; 
+import { UserAvatar } from "@/components/UserAvatar";
 
 interface SwipeCardProps {
   user: FeedUser;
@@ -43,12 +44,13 @@ export function SwipeCard({ user, onSwipe, zIndex }: SwipeCardProps) {
       className="absolute inset-0 cursor-grab active:cursor-grabbing touch-none select-none"
     >
       <div className="relative w-full h-full bg-white rounded-3xl overflow-hidden shadow-xl border border-gray-100">
-        <img
-          src={user.avatarId || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.id}`}
-          alt={user.name}
+        <UserAvatar 
+          avatar={user.avatar} 
+          userId={user.id} 
+          userName={user.name} 
           className="w-full h-full object-cover pointer-events-none"
+          withBorder={false}
         />
-        
         <motion.div style={{ opacity: likeOpacity }} className="absolute top-10 left-10 border-4 border-green-500 text-green-500 font-bold text-4xl px-4 py-2 rounded-xl rotate-[-20deg] pointer-events-none z-20">
           ЛАЙК
         </motion.div>

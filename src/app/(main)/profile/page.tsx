@@ -3,7 +3,6 @@ import { redirect } from "next/navigation";
 import { LogOut } from "lucide-react";
 import { logout } from "@/lib/auth";
 import EditProfileModal from "@/components/EditProfileModal";
-// ⚡️ ДОБАВЛЕНО: Импортируем наш новый интерактивный аватар
 import EditableAvatar from "@/components/EditableAvatar"; 
 
 export default async function ProfilePage() {
@@ -24,11 +23,8 @@ export default async function ProfilePage() {
       <div className="flex-1 overflow-y-auto pb-24">
         <div className="p-8 flex flex-col items-center border-b border-gray-50">
           
-          {/* ⚡️ ИЗМЕНЕНИЕ: Заменили старый статичный <div> с <img> на наш интерактивный EditableAvatar */}
           <EditableAvatar 
             userId={user.id} 
-            // Передаем связанные данные об аватаре (объект из таблицы uploads)
-            // Если привязанного аватара нет, Drizzle вернет null
             initialAvatar={user.avatar || null} 
           />
 

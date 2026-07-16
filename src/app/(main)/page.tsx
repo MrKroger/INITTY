@@ -1,6 +1,6 @@
 import { db } from "@/db";
 import { users, swipes, type User } from "@/db/schema";
-import { getSession } from "@/lib/auth";
+import { getSession, type UserWithAvatar } from "@/lib/auth";
 import { notInArray, eq, and, sql, inArray } from "drizzle-orm";
 import { UserFeedClient } from "@/components/UserFeedClient";
 
@@ -20,7 +20,7 @@ function areFacultiesAdjacent(f1: string = "", f2: string = ""): boolean {
   return check(tech) || check(creative) || check(hum);
 }
 
-export interface FeedUser extends User {
+export interface FeedUser extends UserWithAvatar {
   score?: number;
   isLiker?: boolean;
 }
@@ -30,7 +30,8 @@ export default async function FeedPage() {
   if (!session) return null;
 
   const currentUser = await db.query.users.findFirst({
-    where: eq(users.id, session.id)
+    where: eq(users.id, session.id),
+    with: {avatar: true}
   });
   if (!currentUser) return null;
 
@@ -54,7 +55,8 @@ export default async function FeedPage() {
 
   const likersToDisplay = likerIds.length > 0 
     ? await db.query.users.findMany({
-        where: and(inArray(users.id, likerIds), notInArray(users.id, excludedIds))
+        where: and(inArray(users.id, likerIds), notInArray(users.id, excludedIds)),
+        with: {avatar: true}
       })
     : [];
 
@@ -62,10 +64,11 @@ export default async function FeedPage() {
   const commonUsers = await db.query.users.findMany({
     where: notInArray(users.id, finalExcluded),
     limit: 60,
+    with: {avatar: true}
   });
 
   const sortedCommonUsers = commonUsers
-    .map((targetUser: User) => { // 👈 Указываем, что это базовый User
+    .map((targetUser: UserWithAvatar) => { // 👈 Указываем, что это базовый User
       let score = 0;
 
       // Без "as any" — всё строго типизировано!

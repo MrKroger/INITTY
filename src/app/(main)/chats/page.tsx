@@ -1,6 +1,7 @@
 import { db } from "@/db";
 import { chatParticipants } from "@/db/schema";
 import { getSession } from "@/lib/auth";
+import { UserAvatar } from "@/components/UserAvatar";
 import { eq, ne } from "drizzle-orm";
 import { Users, MessageSquare } from "lucide-react";
 import Link from "next/link";
@@ -14,7 +15,14 @@ export default async function ChatsPage() {
     with: {
       chat: {
         with: {
-          participants: { where: ne(chatParticipants.userId, session.id), with: { user: true } },
+          participants: { 
+            where: ne(chatParticipants.userId, session.id),
+            with: { 
+              user: {
+                with: {avatar: true}
+              }
+            }
+          },
           event: true,
         }
       }
@@ -31,12 +39,23 @@ export default async function ChatsPage() {
         <div className="p-4">
           <h2 className="text-xs font-bold text-gray-400 uppercase mb-4">Совпадения</h2>
           <div className="flex gap-4 overflow-x-auto pb-4 no-scrollbar">
-            {direct.map(c => (
-              <Link key={c.chat.id} href={`/chats/${c.chat.id}`} className="flex flex-col items-center gap-1 min-w-[70px]">
-                <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${c.chat.participants[0]?.user.id}`} className="w-16 h-16 rounded-full border-2 border-pink-500 p-0.5" />
-                <span className="text-[10px] font-bold truncate w-full text-center">{c.chat.participants[0]?.user.name}</span>
-              </Link>
-            ))}
+            {direct.map(c => {
+              const partner = c.chat.participants[0]?.user;
+              if (!partner) return null;
+
+              return (
+                <Link key={c.chat.id} href={`/chats/${c.chat.id}`} className="flex flex-col items-center gap-1 min-w-[70px]">
+                  <UserAvatar 
+                    avatar={partner.avatar} 
+                    userId={partner.id} 
+                    userName={partner.name || "User"} 
+                    className="w-16 h-16"
+                    withBorder={true}
+                  />
+                  <span className="text-[10px] font-bold truncate w-full text-center">{partner.name}</span>
+                </Link>
+              );
+            })}
           </div>
         </div>
         <div className="border-t p-4">
