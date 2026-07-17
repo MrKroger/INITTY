@@ -50,6 +50,7 @@ export function SwipeCard({ user, onSwipe, zIndex }: SwipeCardProps) {
           userName={user.name} 
           className="w-full h-full object-cover pointer-events-none"
           withBorder={false}
+          roundedClass="rounded-none"
         />
         <motion.div style={{ opacity: likeOpacity }} className="absolute top-10 left-10 border-4 border-green-500 text-green-500 font-bold text-4xl px-4 py-2 rounded-xl rotate-[-20deg] pointer-events-none z-20">
           ЛАЙК
@@ -107,7 +108,6 @@ export function SwipeCard({ user, onSwipe, zIndex }: SwipeCardProps) {
           <div className="flex items-center justify-between">
             <div className="flex-1 mr-2">
               <h2 className="text-3xl font-bold truncate">{user.name}</h2>
-              {/* 4. Безопасный вывод факультета и вуза с дефолтными значениями, если они равны null */}
               <p className="text-sm opacity-90 truncate">
                 {user.university || "ВУЗ не указан"} • {user.faculty || "Факультет не указан"}
               </p>

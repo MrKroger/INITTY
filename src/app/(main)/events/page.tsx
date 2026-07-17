@@ -1,6 +1,7 @@
 import { db } from "@/db";
 import { events } from "@/db/schema";
 import { getSession } from "@/lib/auth";
+import { UserAvatar } from "@/components/UserAvatar";
 import Link from "next/link";
 import { Plus } from "lucide-react";
 import { desc } from "drizzle-orm";
@@ -12,7 +13,9 @@ export default async function EventsPage() {
   const allEvents = await db.query.events.findMany({
     orderBy: [desc(events.createdAt)],
     with: {
-      creator: true,
+      creator: {
+        with: { avatar: true }
+      }
     }
   });
 
@@ -61,7 +64,13 @@ export default async function EventsPage() {
                 </p>
 
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-gray-200" />
+                  <UserAvatar 
+                    avatar={event.creator.avatar} 
+                    userId={event.creator.id} 
+                    userName={event.creator.name || "Пользователь"} 
+                    className="w-8 h-8"
+                    withBorder={false}
+                  />
                   <span className="text-xs text-gray-500 font-medium">Создал: {event.creator.name}</span>
                 </div>
               </div>

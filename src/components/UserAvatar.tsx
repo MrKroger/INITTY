@@ -9,6 +9,7 @@ interface UserAvatarProps {
   userName: string;
   className?: string;
   withBorder?: boolean;
+  roundedClass?: string;
 }
 
 export function UserAvatar({
@@ -17,6 +18,7 @@ export function UserAvatar({
   userName,
   className = "w-16 h-16",
   withBorder = false,
+  roundedClass = "rounded-full",
 }: UserAvatarProps) {
   const avatarUrl = avatar?.key
     ? `${process.env.NEXT_PUBLIC_MINIO_PUBLIC_URL}/${avatar.bucket}/${avatar.key}`
@@ -28,7 +30,7 @@ export function UserAvatar({
       alt={userName}
       className={`
         ${className} 
-        rounded-full 
+        ${roundedClass} 
         object-cover 
         ${withBorder ? "border-2 border-pink-500 p-0.5" : ""}
       `}

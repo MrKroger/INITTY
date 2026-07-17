@@ -39,7 +39,6 @@ export async function getSession(): Promise<UserWithAvatar | null> {
     return null;
   }
 
-  // Пробуем расшифровать
   const payload = await decrypt(sessionCookie.value);
 
   if (!payload || !payload.userId) {
@@ -47,15 +46,13 @@ export async function getSession(): Promise<UserWithAvatar | null> {
   }
 
   try {
-    // ⚡️ ИЗМЕНЕНО: добавляем свойство `with`, чтобы подтянуть связь 'avatar'
     const user = await db.query.users.findFirst({
       where: eq(users.id, payload.userId),
       with: {
-        avatar: true, // Инструктирует Drizzle автоматически присоединить данные файла
+        avatar: true,
       },
     });
 
-    // Возвращаем пользователя с кастомным приведением типа для полной уверенности TypeScript
     return (user as UserWithAvatar) || null;
   } catch (dbError) {
     console.error("Ошибка при получении сессии из БД:", dbError);

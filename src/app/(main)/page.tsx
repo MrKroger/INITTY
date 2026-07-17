@@ -68,10 +68,9 @@ export default async function FeedPage() {
   });
 
   const sortedCommonUsers = commonUsers
-    .map((targetUser: UserWithAvatar) => { // 👈 Указываем, что это базовый User
+    .map((targetUser: UserWithAvatar) => {
       let score = 0;
 
-      // Без "as any" — всё строго типизировано!
       if (targetUser.track && currentUser.track && targetUser.track === currentUser.track) {
         score += 30;
       } else if (areFacultiesAdjacent(targetUser.faculty || "", currentUser.faculty || "")) {

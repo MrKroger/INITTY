@@ -36,8 +36,7 @@ export default function OnboardingPage() {
     (isGraduated || (faculty.trim() && course)) && 
     hobbies.length > 0;
 
-  // Безопасный обработчик отправки формы через клиент
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!isValid || isPending) return;
 
@@ -46,11 +45,9 @@ export default function OnboardingPage() {
 
     try {
       const formData = new FormData(e.currentTarget);
-      // Принудительно передаем hobbies в FormData, так как это массив в стейте
       formData.set("hobbies", JSON.stringify(hobbies));
 
       await completeOnboarding(formData);
-      // После успешного онбординга делаем жесткий реверс роутера для обновления сессии
       router.push("/");
       router.refresh();
     } catch (err: any) {

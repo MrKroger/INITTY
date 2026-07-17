@@ -25,26 +25,22 @@ export default function AvatarUploadModal({
 
   if (!isOpen) return null;
 
-  // Обработка выбора файла через проводник
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
     processFile(selectedFile);
   };
 
-  // Валидация и создание превью
   const processFile = (selectedFile?: File) => {
     if (!selectedFile) return;
 
     setError(null);
 
-    // Проверка формата
     const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
     if (!allowedTypes.includes(selectedFile.type)) {
       setError("Разрешены только форматы JPEG, PNG и WebP");
       return;
     }
 
-    // Проверка размера (5MB)
     if (selectedFile.size > 5 * 1024 * 1024) {
       setError("Размер файла не должен превышать 5 MB");
       return;
@@ -54,7 +50,6 @@ export default function AvatarUploadModal({
     setPreviewUrl(URL.createObjectURL(selectedFile));
   };
 
-  // Обработка Drag-and-Drop
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(true);
@@ -71,7 +66,6 @@ export default function AvatarUploadModal({
     processFile(droppedFile);
   };
 
-  // Отправка файла на сервер
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!file) return;
@@ -83,7 +77,6 @@ export default function AvatarUploadModal({
       const formData = new FormData();
       formData.append("file", file);
 
-      // Вызываем наш серверный экшен
       const response = await uploadAvatarAction(userId, formData);
 
       if (response.success && response.avatarUrl) {
@@ -99,7 +92,6 @@ export default function AvatarUploadModal({
     }
   };
 
-  // Очистка состояния при закрытии
   const handleClose = () => {
     setFile(null);
     if (previewUrl) URL.revokeObjectURL(previewUrl);
@@ -112,7 +104,6 @@ export default function AvatarUploadModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
       <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 animate-in fade-in zoom-in-95 duration-150">
         
-        {/* Заголовок */}
         <div className="flex items-center justify-between border-b border-zinc-100 dark:border-zinc-850 pb-4">
           <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">
             Обновить аватар
@@ -125,10 +116,8 @@ export default function AvatarUploadModal({
           </button>
         </div>
 
-        {/* Форма загрузки */}
         <form onSubmit={handleSubmit} className="mt-6 space-y-4">
           
-          {/* Зона Drag & Drop */}
           <div
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
@@ -150,7 +139,6 @@ export default function AvatarUploadModal({
 
             {previewUrl ? (
               <div className="flex flex-col items-center space-y-3">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={previewUrl}
                   alt="Превью"
@@ -173,14 +161,12 @@ export default function AvatarUploadModal({
             )}
           </div>
 
-          {/* Отображение ошибки */}
           {error && (
             <div className="rounded-lg bg-red-50 dark:bg-red-950/30 p-3 text-sm text-red-500 dark:text-red-400 border border-red-100 dark:border-red-900/30">
               ⚠️ {error}
             </div>
           )}
 
-          {/* Кнопки действий */}
           <div className="flex justify-end space-x-3 pt-4 border-t border-zinc-100 dark:border-zinc-850">
             <button
               type="button"

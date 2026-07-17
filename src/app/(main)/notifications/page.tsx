@@ -39,10 +39,9 @@ export default async function NotificationsPage() {
     });
   }
 
-  // 3. Объединяем уведомления со статусами их заявок
   const notificationsWithStatus = myNotifications.map((n) => ({
     ...n,
-    applicationStatus: applicationStatuses[n.id] || null, // Передаем статус (approved/rejected/pending/null)
+    applicationStatus: applicationStatuses[n.id] || null,
   }));
 
   return (
