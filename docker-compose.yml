@@ -6,9 +6,9 @@ services:
     container_name: student-dating-db
     restart: unless-stopped
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: secretpassword
-      POSTGRES_DB: student_dating
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME:-student_dating}
     ports:
       - "5432:5432"
     volumes:
@@ -22,8 +22,8 @@ services:
       - "9000:9000" # Порт для API (загрузка файлов)
       - "9001:9001" # Порт для веб-консоли (управление в браузере)
     environment:
-      MINIO_ROOT_USER: unity_admin
-      MINIO_ROOT_PASSWORD: unity_secure_password
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
     command: server /data --console-address ":9001"
     volumes:
       - minio_data:/data
