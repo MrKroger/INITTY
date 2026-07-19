@@ -20,12 +20,12 @@ function areFacultiesAdjacent(f1: string = "", f2: string = ""): boolean {
   return check(tech) || check(creative) || check(hum);
 }
 
-export interface FeedUser extends UserWithAvatar {
+interface FeedUser extends UserWithAvatar {
   score?: number;
   isLiker?: boolean;
 }
 
-export default async function FeedPage() {
+async function FeedPage() {
   const session = await getSession();
   if (!session) return null;
 
@@ -126,3 +126,6 @@ export default async function FeedPage() {
     </div>
   );
 }
+
+export { type FeedUser };
+export default FeedPage;

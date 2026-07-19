@@ -12,7 +12,7 @@ export interface UploadResponse {
   avatarUrl?: string;
 }
 
-export async function uploadAvatarAction(
+async function uploadAvatarAction(
   userId: string,
   formData: FormData
 ): Promise<UploadResponse> {
@@ -66,4 +66,8 @@ export async function uploadAvatarAction(
     console.error("Ошибка при выполнении экшена uploadAvatar:", err);
     return { success: false, error: "Не удалось сохранить файл на сервере" };
   }
+}
+
+export{
+  uploadAvatarAction
 }

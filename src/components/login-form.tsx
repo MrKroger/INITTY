@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { loginAction } from "@/lib/actions/login";
 
-export function LoginForm() {
+function LoginForm() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
@@ -77,4 +77,8 @@ export function LoginForm() {
       </p>
     </div>
   );
+}
+
+export{
+    LoginForm
 }

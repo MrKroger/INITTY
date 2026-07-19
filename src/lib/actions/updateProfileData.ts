@@ -6,7 +6,7 @@ import { getSession } from "@/lib/auth";
 import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 
-export async function updateProfileData(data: {
+async function updateProfileData(data: {
   university: string;
   faculty: string;
   isGraduated: boolean;
@@ -33,4 +33,8 @@ export async function updateProfileData(data: {
     .where(eq(users.id, session.id));
 
   revalidatePath("/profile");
+}
+
+export{
+  updateProfileData
 }

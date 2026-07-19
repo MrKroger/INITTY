@@ -12,7 +12,7 @@ import { getSession } from "@/lib/auth";
 import { and, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 
-export async function applyToEvent(eventId: string) {
+async function applyToEvent(eventId: string) {
   const session = await getSession();
   if (!session) throw new Error("Unauthorized");
 
@@ -110,4 +110,8 @@ export async function applyToEvent(eventId: string) {
   revalidatePath("/events");
   revalidatePath("/notifications"); 
   return { success: true };
+}
+
+export{
+  applyToEvent
 }

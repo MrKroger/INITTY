@@ -12,7 +12,7 @@ interface SwipeCardProps {
   zIndex?: number;
 }
 
-export function SwipeCard({ user, onSwipe, zIndex }: SwipeCardProps) {
+function SwipeCard({ user, onSwipe, zIndex }: SwipeCardProps) {
   const [exitX, setExitX] = useState<number>(0);
   const [showBio, setShowBio] = useState(false);
   
@@ -139,4 +139,8 @@ export function SwipeCard({ user, onSwipe, zIndex }: SwipeCardProps) {
       </div>
     </motion.div>
   );
+}
+
+export{
+  SwipeCard
 }

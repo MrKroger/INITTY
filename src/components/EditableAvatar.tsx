@@ -12,7 +12,7 @@ interface EditableAvatarProps {
   } | null;
 }
 
-export default function EditableAvatar({ userId, initialAvatar }: EditableAvatarProps) {
+function EditableAvatar({ userId, initialAvatar }: EditableAvatarProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const initialUrl = initialAvatar
@@ -59,3 +59,5 @@ export default function EditableAvatar({ userId, initialAvatar }: EditableAvatar
     </div>
   );
 }
+
+export default EditableAvatar;

@@ -1,7 +1,7 @@
 import { pgTable, text, timestamp, uuid, boolean, integer, json } from "drizzle-orm/pg-core";
 import { relations, type InferSelectModel } from "drizzle-orm";
 
-export const uploads = pgTable("uploads", {
+const uploads = pgTable("uploads", {
   id: uuid("id").defaultRandom().primaryKey(),
   key: text("key").notNull(),
   bucket: text("bucket").notNull(),
@@ -10,9 +10,9 @@ export const uploads = pgTable("uploads", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
-export type Upload = InferSelectModel<typeof uploads>;
+type Upload = InferSelectModel<typeof uploads>;
 
-export const users = pgTable("users", {
+const users = pgTable("users", {
   id: uuid("id").defaultRandom().primaryKey(),
   name: text("name").notNull(),
   email: text("email").notNull().unique(),
@@ -21,7 +21,8 @@ export const users = pgTable("users", {
   faculty: text("faculty"),
   isGraduated: boolean("is_graduated").default(false),
   course: integer("course"),
-  hobbies: json("user_hobbies").$type<string[]>(),  bio: text("bio"),
+  hobbies: json("user_hobbies").$type<string[]>(),  
+  bio: text("bio"),
   avatarId: uuid("avatar_id").references(() => uploads.id, { onDelete: "set null" }),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   isOnboarded: boolean("is_onboarded").default(false),
@@ -31,9 +32,9 @@ export const users = pgTable("users", {
   lockoutUntil: timestamp("lockout_until"),
 });
 
-export type User = InferSelectModel<typeof users>;
+type User = InferSelectModel<typeof users>;
 
-export const swipes = pgTable("swipes", {
+const swipes = pgTable("swipes", {
   id: uuid("id").defaultRandom().primaryKey(),
   fromUserId: uuid("from_user_id").references(() => users.id).notNull(),
   toUserId: uuid("to_user_id").references(() => users.id).notNull(),
@@ -41,7 +42,7 @@ export const swipes = pgTable("swipes", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
-export const events = pgTable("events", {
+const events = pgTable("events", {
   id: uuid("id").defaultRandom().primaryKey(),
   creatorId: uuid("creator_id").references(() => users.id).notNull(),
   title: text("title").notNull(),
@@ -51,7 +52,7 @@ export const events = pgTable("events", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
-export const eventApplications = pgTable("event_applications", {
+const eventApplications = pgTable("event_applications", {
   id: uuid("id").defaultRandom().primaryKey(),
   eventId: uuid("event_id").references(() => events.id).notNull(),
   userId: uuid("user_id").references(() => users.id).notNull(),
@@ -59,14 +60,14 @@ export const eventApplications = pgTable("event_applications", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
-export const chats = pgTable("chats", {
+const chats = pgTable("chats", {
   id: uuid("id").defaultRandom().primaryKey(),
   type: text("type").notNull(),
   eventId: uuid("event_id").references(() => events.id),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
-export const messages = pgTable("messages", {
+const messages = pgTable("messages", {
   id: uuid("id").defaultRandom().primaryKey(),
   chatId: uuid("chat_id").references(() => chats.id).notNull(),
   senderId: uuid("sender_id").references(() => users.id).notNull(),
@@ -74,13 +75,13 @@ export const messages = pgTable("messages", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
-export const chatParticipants = pgTable("chat_participants", {
+const chatParticipants = pgTable("chat_participants", {
   id: uuid("id").defaultRandom().primaryKey(),
   chatId: uuid("chat_id").references(() => chats.id).notNull(),
   userId: uuid("user_id").references(() => users.id).notNull(),
 });
 
-export const notifications = pgTable("notifications", {
+const notifications = pgTable("notifications", {
   id: uuid("id").defaultRandom().primaryKey(),
   userId: uuid("user_id").references(() => users.id).notNull(), 
   fromUserId: uuid("from_user_id").references(() => users.id).notNull(), 
@@ -90,7 +91,7 @@ export const notifications = pgTable("notifications", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
-export const eventBoardItems = pgTable("event_board_items", {
+const eventBoardItems = pgTable("event_board_items", {
   id: uuid("id").defaultRandom().primaryKey(),
   eventId: uuid("event_id").references(() => events.id).notNull(),
   creatorId: uuid("creator_id").references(() => users.id).notNull(),
@@ -98,7 +99,7 @@ export const eventBoardItems = pgTable("event_board_items", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
-export const userRelations = relations(users, ({ many, one }) => ({
+const userRelations = relations(users, ({ many, one }) => ({
   swipes: many(swipes, { relationName: "fromUser" }),
   receivedSwipes: many(swipes, { relationName: "toUser" }),
   events: many(events),
@@ -112,14 +113,14 @@ export const userRelations = relations(users, ({ many, one }) => ({
   }),
 }));
 
-export const uploadRelations = relations(uploads, ({ one }) => ({
+const uploadRelations = relations(uploads, ({ one }) => ({
   user: one(users, {
     fields: [uploads.id],
     references: [users.avatarId],
   }),
 }));
 
-export const swipeRelations = relations(swipes, ({ one }) => ({
+const swipeRelations = relations(swipes, ({ one }) => ({
   fromUser: one(users, {
     fields: [swipes.fromUserId],
     references: [users.id],
@@ -132,7 +133,7 @@ export const swipeRelations = relations(swipes, ({ one }) => ({
   }),
 }));
 
-export const eventRelations = relations(events, ({ one, many }) => ({
+const eventRelations = relations(events, ({ one, many }) => ({
   creator: one(users, {
     fields: [events.creatorId],
     references: [users.id],
@@ -140,7 +141,7 @@ export const eventRelations = relations(events, ({ one, many }) => ({
   applications: many(eventApplications),
 }));
 
-export const eventApplicationRelations = relations(eventApplications, ({ one }) => ({
+const eventApplicationRelations = relations(eventApplications, ({ one }) => ({
   event: one(events, {
     fields: [eventApplications.eventId],
     references: [events.id],
@@ -151,7 +152,7 @@ export const eventApplicationRelations = relations(eventApplications, ({ one }) 
   }),
 }));
 
-export const chatRelations = relations(chats, ({ many, one }) => ({
+const chatRelations = relations(chats, ({ many, one }) => ({
   participants: many(chatParticipants),
   messages: many(messages),
   event: one(events, {
@@ -160,7 +161,7 @@ export const chatRelations = relations(chats, ({ many, one }) => ({
   }),
 }));
 
-export const chatParticipantRelations = relations(chatParticipants, ({ one }) => ({
+const chatParticipantRelations = relations(chatParticipants, ({ one }) => ({
   chat: one(chats, {
     fields: [chatParticipants.chatId],
     references: [chats.id],
@@ -171,7 +172,7 @@ export const chatParticipantRelations = relations(chatParticipants, ({ one }) =>
   }),
 }));
 
-export const messageRelations = relations(messages, ({ one }) => ({
+const messageRelations = relations(messages, ({ one }) => ({
   chat: one(chats, {
     fields: [messages.chatId],
     references: [chats.id],
@@ -182,13 +183,38 @@ export const messageRelations = relations(messages, ({ one }) => ({
   }),
 }));
 
-export const notificationRelations = relations(notifications, ({ one }) => ({
+const notificationRelations = relations(notifications, ({ one }) => ({
   user: one(users, { fields: [notifications.userId], references: [users.id], relationName: "targetUser" }),
   fromUser: one(users, { fields: [notifications.fromUserId], references: [users.id], relationName: "sourceUser" }),
   event: one(events, { fields: [notifications.eventId], references: [events.id] }),
 }));
 
-export const eventBoardItemRelations = relations(eventBoardItems, ({ one }) => ({
+const eventBoardItemRelations = relations(eventBoardItems, ({ one }) => ({
   event: one(events, { fields: [eventBoardItems.eventId], references: [events.id] }),
   creator: one(users, { fields: [eventBoardItems.creatorId], references: [users.id] }),
 }));
+
+export {
+  uploads,
+  users,
+  swipes,
+  events,
+  eventApplications,
+  chats,
+  messages,
+  chatParticipants,
+  notifications,
+  eventBoardItems,
+  userRelations,
+  uploadRelations,
+  swipeRelations,
+  eventRelations,
+  eventApplicationRelations,
+  chatRelations,
+  chatParticipantRelations,
+  messageRelations,
+  notificationRelations,
+  eventBoardItemRelations,
+  type Upload,
+  type User,
+};

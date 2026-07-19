@@ -8,7 +8,7 @@ import { desc } from "drizzle-orm";
 import { cn } from "@/lib/utils";
 import { applyToEvent } from "@/lib/actions/applyToEvent";
 
-export default async function EventsPage() {
+async function EventsPage() {
   const session = await getSession();
   const allEvents = await db.query.events.findMany({
     orderBy: [desc(events.createdAt)],
@@ -92,3 +92,5 @@ export default async function EventsPage() {
     </div>
   );
 }
+
+export default EventsPage;

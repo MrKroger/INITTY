@@ -6,7 +6,7 @@ import { swipe } from "@/lib/actions/swipe";
 import { Heart, X } from "lucide-react";
 import { type FeedUser } from "@/app/(main)/page";
 
-export function UserFeedClient({ initialUsers }: { initialUsers: FeedUser[] }) {
+function UserFeedClient({ initialUsers }: { initialUsers: FeedUser[] }) {
   const [users, setUsers] = useState<FeedUser[]>(initialUsers);
   const [currentIndex, setCurrentIndex] = useState(users.length - 1);
 
@@ -86,4 +86,8 @@ export function UserFeedClient({ initialUsers }: { initialUsers: FeedUser[] }) {
       )}
     </div>
   );
+}
+
+export{
+  UserFeedClient
 }

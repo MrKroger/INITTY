@@ -7,7 +7,7 @@ import { SignJWT, jwtVerify } from "jose";
 const MAX_ATTEMPTS = 5;
 const LOCKOUT_DURATION_MS = 15 * 60 * 1000;
 
-export type UserWithAvatar = User & {
+type UserWithAvatar = User & {
   avatar: Upload | null;
 };
 
@@ -34,7 +34,7 @@ async function decrypt(token: string) {
   }
 }
 
-export async function getSession(): Promise<UserWithAvatar | null> {
+async function getSession(): Promise<UserWithAvatar | null> {
   const sessionCookie = (await cookies()).get("session_id");
     
   if (!sessionCookie) {
@@ -63,7 +63,7 @@ export async function getSession(): Promise<UserWithAvatar | null> {
   }
 }
 
-export async function login(userId: string) {
+async function login(userId: string) {
   const token = await encrypt({ userId });
 
   (await cookies()).set("session_id", token, {
@@ -75,7 +75,7 @@ export async function login(userId: string) {
   });
 }
 
-export async function logout() {
+async function logout() {
   (await cookies()).delete("session_id");
 }
 
@@ -93,7 +93,7 @@ export function getLockoutTimeLeft(user: Pick<User, "lockoutUntil">): number | n
   return null;
 }
 
-export async function handleLoginAttempt(
+async function handleLoginAttempt(
   user: Pick<User, "id" | "failedAttempts">,
   isSuccess: boolean
 ): Promise<{ isLockedOut: boolean; remainingAttempts: number }> {
@@ -125,4 +125,13 @@ export async function handleLoginAttempt(
       remainingAttempts: Math.max(0, MAX_ATTEMPTS - nextAttempts),
     };
   }
+}
+
+export {
+  type UserWithAvatar,
+  getSession,
+  login,
+  logout,
+  handleLoginAttempt,
+  
 }

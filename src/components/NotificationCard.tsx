@@ -21,7 +21,7 @@ interface NotificationCardProps {
   };
 }
 
-export function NotificationCard({ notification }: NotificationCardProps) {
+function NotificationCard({ notification }: NotificationCardProps) {
   const cardRef = useRef<HTMLDivElement>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -130,4 +130,8 @@ export function NotificationCard({ notification }: NotificationCardProps) {
       )}
     </div>
   );
+}
+
+export{
+  NotificationCard
 }

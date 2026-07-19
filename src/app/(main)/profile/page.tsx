@@ -5,7 +5,7 @@ import { logout } from "@/lib/auth";
 import EditProfileModal from "@/components/EditProfileModal";
 import EditableAvatar from "@/components/EditableAvatar"; 
 
-export default async function ProfilePage() {
+async function ProfilePage() {
   const user = await getSession();
   if (!user) redirect("/login");
 
@@ -65,3 +65,5 @@ export default async function ProfilePage() {
     </div>
   );
 }
+
+export default ProfilePage;

@@ -4,7 +4,7 @@ import { login } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 
-export default function RegisterPage() {
+function RegisterPage() {
   async function handleRegister(formData: FormData) {
     "use server";
     const name = formData.get("name") as string;
@@ -74,3 +74,5 @@ export default function RegisterPage() {
     </div>
   );
 }
+
+export default RegisterPage;

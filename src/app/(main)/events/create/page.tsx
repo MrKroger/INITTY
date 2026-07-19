@@ -4,7 +4,7 @@ import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { CreateEventForm } from "@/components/CreateEventForm";
 
-export default async function CreateEventPage() {
+async function CreateEventPage() {
   const session = await getSession();
   if (!session) redirect("/login");
 
@@ -21,3 +21,5 @@ export default async function CreateEventPage() {
     </div>
   );
 }
+
+export default CreateEventPage;

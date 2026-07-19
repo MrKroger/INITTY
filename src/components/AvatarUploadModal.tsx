@@ -10,7 +10,7 @@ interface AvatarUploadModalProps {
   onUploadSuccess: (newAvatarUrl: string) => void;
 }
 
-export default function AvatarUploadModal({
+function AvatarUploadModal({
   isOpen,
   onClose,
   userId,
@@ -196,3 +196,5 @@ export default function AvatarUploadModal({
     </div>
   );
 }
+
+export default AvatarUploadModal;

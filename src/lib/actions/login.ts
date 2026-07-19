@@ -5,12 +5,12 @@ import { users } from "@/db/schema";
 import { login, getLockoutTimeLeft, handleLoginAttempt } from "@/lib/auth";
 import { eq } from "drizzle-orm";
 
-export type LoginResponse = {
+type LoginResponse = {
   success: boolean;
   error?: string;
 };
 
-export async function loginAction(formData: FormData): Promise<LoginResponse> {
+async function loginAction(formData: FormData): Promise<LoginResponse> {
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
 
@@ -57,4 +57,9 @@ export async function loginAction(formData: FormData): Promise<LoginResponse> {
     console.error("Ошибка при авторизации:", error);
     return { success: false, error: "Что-то пошло не так. Попробуйте позже." };
   }
+}
+
+export{
+  type LoginResponse,
+  loginAction
 }

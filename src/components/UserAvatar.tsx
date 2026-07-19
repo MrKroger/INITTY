@@ -12,7 +12,7 @@ interface UserAvatarProps {
   roundedClass?: string;
 }
 
-export function UserAvatar({
+function UserAvatar({
   avatar,
   userId,
   userName,
@@ -39,4 +39,8 @@ export function UserAvatar({
       }}
     />
   );
+}
+
+export{
+  UserAvatar
 }

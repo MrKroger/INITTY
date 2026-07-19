@@ -7,7 +7,7 @@ import { ArrowLeft, MessageCircle, Send } from "lucide-react";
 import Link from "next/link";
 import { addBoardItem } from "@/lib/actions/addBoardItem";
 
-export default async function EventBoardPage({ params }: { params: { id: string } }) {
+async function EventBoardPage({ params }: { params: { id: string } }) {
   const { id } = await params;
   const session = await getSession();
   if (!session) redirect("/login");
@@ -66,3 +66,5 @@ export default async function EventBoardPage({ params }: { params: { id: string 
     </div>
   );
 }
+
+export default EventBoardPage;

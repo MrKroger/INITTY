@@ -9,7 +9,7 @@ import { getSession } from "@/lib/auth";
 import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 
-export async function addBoardItem(eventId: string, content: string) {
+async function addBoardItem(eventId: string, content: string) {
   const session = await getSession();
   if (!session) throw new Error("Unauthorized");
 
@@ -28,4 +28,8 @@ export async function addBoardItem(eventId: string, content: string) {
   });
 
   revalidatePath(`/events/${eventId}/board`);
+}
+
+export{
+  addBoardItem
 }

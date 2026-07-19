@@ -4,7 +4,7 @@ import { useActionState } from "react";
 import { createEvent, ActionState } from "@/lib/actions/events";
 import { Loader2 } from "lucide-react";
 
-export function CreateEventForm() {
+function CreateEventForm() {
   const [state, formAction, isPending] = useActionState<ActionState | null, FormData>(
     createEvent,
     null
@@ -111,4 +111,8 @@ export function CreateEventForm() {
       </button>
     </form>
   );
+}
+
+export {
+  CreateEventForm
 }

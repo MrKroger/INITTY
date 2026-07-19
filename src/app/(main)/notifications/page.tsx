@@ -5,7 +5,7 @@ import { eq, desc, inArray } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import { NotificationCard } from "@/components/NotificationCard";
 
-export default async function NotificationsPage() {
+async function NotificationsPage() {
   const user = await getSession();
   if (!user) redirect("/login");
 
@@ -64,3 +64,5 @@ export default async function NotificationsPage() {
     </div>
   );
 }
+
+export default NotificationsPage;

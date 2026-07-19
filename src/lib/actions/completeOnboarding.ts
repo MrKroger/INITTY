@@ -7,7 +7,7 @@ import { getSession } from "@/lib/auth";
 import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 
-export async function completeOnboarding(formData: FormData) {
+async function completeOnboarding(formData: FormData) {
   const session = await getSession();
   if (!session?.id) throw new Error("Unauthorized");
 
@@ -40,4 +40,8 @@ export async function completeOnboarding(formData: FormData) {
 
   revalidatePath("/");
   redirect("/");
+}
+
+export{
+  completeOnboarding
 }

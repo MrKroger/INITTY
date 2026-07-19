@@ -5,7 +5,7 @@ import { X, School, Award, Hash, GraduationCap } from "lucide-react";
 import { completeOnboarding } from "@/lib/actions/completeOnboarding";
 import { useRouter } from "next/navigation";
 
-export default function OnboardingPage() {
+function OnboardingPage() {
   const router = useRouter();
   const [university, setUniversity] = useState("");
   const [faculty, setFaculty] = useState("");
@@ -172,3 +172,5 @@ export default function OnboardingPage() {
     </div>
   );
 }
+
+export default OnboardingPage;

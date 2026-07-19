@@ -6,7 +6,7 @@ import { getSession } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
-export type ActionState = {
+type ActionState = {
   success?: boolean;
   error?: string;
   fieldErrors?: {
@@ -17,7 +17,7 @@ export type ActionState = {
   };
 };
 
-export async function createEvent(prevState: ActionState | null, formData: FormData): Promise<ActionState> {
+async function createEvent(prevState: ActionState | null, formData: FormData): Promise<ActionState> {
   const session = await getSession();
   if (!session) {
     return { error: "Вы должны быть авторизованы для создания события." };
@@ -80,4 +80,9 @@ export async function createEvent(prevState: ActionState | null, formData: FormD
   revalidatePath("/events");
   
   redirect("/events");
+}
+
+export{
+  createEvent,
+  type ActionState
 }

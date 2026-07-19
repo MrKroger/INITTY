@@ -12,7 +12,7 @@ import { revalidatePath } from "next/cache";
 
 const MAX_SWIPES_PER_MINUTE = 40;
 
-export async function swipe(toUserId: string, type: "like" | "pass") {
+async function swipe(toUserId: string, type: "like" | "pass") {
   const session = await getSession();
   if (!session) throw new Error("Unauthorized");
 
@@ -98,4 +98,8 @@ export async function swipe(toUserId: string, type: "like" | "pass") {
     }
 
     return { match: false };
+}
+
+export{
+  swipe
 }

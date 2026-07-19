@@ -6,7 +6,7 @@ import { eq, ne } from "drizzle-orm";
 import { Users, MessageSquare } from "lucide-react";
 import Link from "next/link";
 
-export default async function ChatsPage() {
+async function ChatsPage() {
   const session = await getSession();
   if (!session) return null;
 
@@ -76,3 +76,5 @@ export default async function ChatsPage() {
     </div>
   );
 }
+
+export default ChatsPage;

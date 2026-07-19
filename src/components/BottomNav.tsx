@@ -9,7 +9,7 @@ interface BottomNavProps {
   unreadNotificationsCount?: number;
 }
 
-export function BottomNav({ unreadNotificationsCount = 0 }: BottomNavProps) {
+function BottomNav({ unreadNotificationsCount = 0 }: BottomNavProps) {
   const pathname = usePathname();
 
   const items = [
@@ -55,4 +55,8 @@ export function BottomNav({ unreadNotificationsCount = 0 }: BottomNavProps) {
       })}
     </nav>
   );
+}
+
+export{
+  BottomNav
 }

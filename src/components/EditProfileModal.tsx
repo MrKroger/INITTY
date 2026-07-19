@@ -16,7 +16,7 @@ interface EditProfileModalProps {
   };
 }
 
-export default function EditProfileModal({ user }: EditProfileModalProps) {
+function EditProfileModal({ user }: EditProfileModalProps) {
   const [isOpen, setIsOpen] = useState(false);
   
   const [name, setName] = useState(user.name);
@@ -191,3 +191,5 @@ export default function EditProfileModal({ user }: EditProfileModalProps) {
     </>
   );
 }
+
+export default EditProfileModal;

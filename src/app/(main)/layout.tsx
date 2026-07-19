@@ -5,7 +5,7 @@ import { db } from "@/db";
 import { notifications } from "@/db/schema";
 import { and, eq, count } from "drizzle-orm";
 
-export default async function MainLayout({
+async function MainLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -41,3 +41,5 @@ export default async function MainLayout({
     </div>
   );
 }
+
+export default MainLayout;

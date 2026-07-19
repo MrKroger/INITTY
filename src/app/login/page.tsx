@@ -2,7 +2,7 @@ import { getSession } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { LoginForm } from "@/components/login-form";
 
-export default async function LoginPage() {
+async function LoginPage() {
   const session = await getSession();
   
   if (session) {
@@ -15,3 +15,5 @@ export default async function LoginPage() {
     </div>
   );
 }
+
+export default LoginPage;

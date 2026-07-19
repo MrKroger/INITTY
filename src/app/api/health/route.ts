@@ -1,9 +1,9 @@
 import { db } from "@/db";
 import { sql } from "drizzle-orm";
 
-export const dynamic = "force-dynamic";
+const dynamic = "force-dynamic";
 
-export async function GET() {
+async function GET() {
   try {
     await db.execute(sql`select 1`);
     return Response.json({ ok: true });
@@ -11,3 +11,8 @@ export async function GET() {
     return Response.json({ ok: false }, { status: 500 });
   }
 }
+
+export {
+  dynamic,
+  GET,
+};

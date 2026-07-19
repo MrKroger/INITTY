@@ -11,7 +11,7 @@ import { getSession } from "@/lib/auth";
 import { and, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 
-export async function handleEventApplication(applicationId: string, status: "approved" | "rejected") {
+async function handleEventApplication(applicationId: string, status: "approved" | "rejected") {
   const session = await getSession();
   if (!session) throw new Error("Unauthorized");
 
@@ -73,4 +73,8 @@ export async function handleEventApplication(applicationId: string, status: "app
 
   revalidatePath("/profile");
   revalidatePath("/notifications");
+}
+
+export{
+  handleEventApplication
 }
