@@ -1,4 +1,4 @@
-"use client"; // Обязательно! Это клиентский интерактивный компонент
+"use client"; 
 
 import React, { useState } from "react";
 import AvatarUploadModal from "./AvatarUploadModal";

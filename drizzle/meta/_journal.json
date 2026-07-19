@@ -15,6 +15,13 @@
       "when": 1784149184092,
       "tag": "0001_powerful_mysterio",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1784287379245,
+      "tag": "0002_flippant_wendell_rand",
+      "breakpoints": true
     }
   ]
 }

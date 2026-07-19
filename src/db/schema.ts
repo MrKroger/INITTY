@@ -27,6 +27,8 @@ export const users = pgTable("users", {
   isOnboarded: boolean("is_onboarded").default(false),
   track: text("track"),
   purpose: text("purpose"),
+  failedAttempts: integer("failed_attempts").default(0).notNull(),
+  lockoutUntil: timestamp("lockout_until"),
 });
 
 export type User = InferSelectModel<typeof users>;
