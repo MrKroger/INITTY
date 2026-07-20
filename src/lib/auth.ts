@@ -79,7 +79,7 @@ async function logout() {
   (await cookies()).delete("session_id");
 }
 
-export function getLockoutTimeLeft(user: Pick<User, "lockoutUntil">): number | null {
+function getLockoutTimeLeft(user: Pick<User, "lockoutUntil">): number | null {
   if (!user.lockoutUntil) return null;
 
   const now = new Date();
@@ -132,6 +132,6 @@ export {
   getSession,
   login,
   logout,
-  handleLoginAttempt,
-  
-}
+  getLockoutTimeLeft,
+  handleLoginAttempt
+};

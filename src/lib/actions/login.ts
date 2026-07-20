@@ -4,6 +4,7 @@ import { db } from "@/db";
 import { users } from "@/db/schema";
 import { login, getLockoutTimeLeft, handleLoginAttempt } from "@/lib/auth";
 import { eq } from "drizzle-orm";
+import bcrypt from "bcryptjs";
 
 type LoginResponse = {
   success: boolean;
@@ -33,7 +34,8 @@ async function loginAction(formData: FormData): Promise<LoginResponse> {
       };
     }
 
-    const isPasswordValid = user.password === password;
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    
     const { isLockedOut, remainingAttempts } = await handleLoginAttempt(user, isPasswordValid);
 
     if (!isPasswordValid) {
@@ -59,7 +61,7 @@ async function loginAction(formData: FormData): Promise<LoginResponse> {
   }
 }
 
-export{
+export {
   type LoginResponse,
   loginAction
-}
+};

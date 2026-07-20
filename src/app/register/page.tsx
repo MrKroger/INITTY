@@ -3,6 +3,7 @@ import { users } from "@/db/schema";
 import { login } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
+import bcrypt from "bcryptjs";
 
 function RegisterPage() {
   async function handleRegister(formData: FormData) {
@@ -11,10 +12,12 @@ function RegisterPage() {
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
 
+    const hashedPassword = await bcrypt.hash(password, 10);
+
     const [newUser] = await db.insert(users).values({
       name,
       email,
-      password, // В будущем bcrypt, пока заглушка
+      password: hashedPassword,
     }).returning();
 
     if (newUser) {
