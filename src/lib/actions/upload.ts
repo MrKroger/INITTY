@@ -5,6 +5,7 @@ import { PutObjectCommand } from "@aws-sdk/client-s3";
 import { db } from "@/db/index";
 import { uploads, users } from "@/db/schema";
 import { eq } from "drizzle-orm";
+import { getSession } from "@/lib/auth";
 
 export interface UploadResponse {
   success: boolean;
@@ -13,10 +14,16 @@ export interface UploadResponse {
 }
 
 async function uploadAvatarAction(
-  userId: string,
   formData: FormData
 ): Promise<UploadResponse> {
   try {
+    const session = await getSession();
+    if (!session || !session.id) {
+      return { success: false, error: "Пользователь не авторизован" };
+    }
+
+    const userId = session.id;
+
     const file = formData.get("file") as File;
     if (!file) {
       return { success: false, error: "Файл не найден" };

@@ -77,7 +77,7 @@ function AvatarUploadModal({
       const formData = new FormData();
       formData.append("file", file);
 
-      const response = await uploadAvatarAction(userId, formData);
+      const response = await uploadAvatarAction(formData);
 
       if (response.success && response.avatarUrl) {
         onUploadSuccess(response.avatarUrl);
