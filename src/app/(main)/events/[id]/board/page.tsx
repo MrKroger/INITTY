@@ -1,7 +1,7 @@
 import { db } from "@/db";
-import { eventBoardItems, events, chats } from "@/db/schema";
+import { eventBoardItems, events, chats, eventApplications } from "@/db/schema";
 import { getSession } from "@/lib/auth";
-import { eq, desc } from "drizzle-orm";
+import { eq, and, desc } from "drizzle-orm";
 import { notFound, redirect } from "next/navigation";
 import { ArrowLeft, MessageCircle } from "lucide-react";
 import Link from "next/link";
@@ -17,6 +17,16 @@ async function EventBoardPage({ params }: { params: Promise<{ id: string }> }) {
     with: { creator: true }
   });
   if (!event) notFound();
+
+  await db
+    .update(eventApplications)
+    .set({ lastBoardReadAt: new Date() })
+    .where(
+      and(
+        eq(eventApplications.eventId, id),
+        eq(eventApplications.userId, session.id)
+      )
+    );
 
   const boardItems = await db.query.eventBoardItems.findMany({
     where: eq(eventBoardItems.eventId, id),

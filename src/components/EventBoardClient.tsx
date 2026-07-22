@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Send } from "lucide-react";
 import { addBoardItem } from "@/lib/actions/addBoardItem";
+import { useSSE } from "@/components/providers/SSEProvider";
 
 interface BoardItem {
   id: string;
@@ -28,28 +29,31 @@ function EventBoardClient({
   const [content, setContent] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const { lastMessage, markAsRead } = useSSE();
+
   useEffect(() => {
-    if (!eventId) return;
+  if (eventId) {
+    markAsRead(eventId);
+  }
+}, [eventId, markAsRead]);
 
-    const eventSource = new EventSource(`/api/events/${eventId}/sse`);
+useEffect(() => {
+  if (!lastMessage) return;
 
-    eventSource.onmessage = (event) => {
-      try {
-        const newItem = JSON.parse(event.data);
-        
-        setItems((prev) => {
-          if (prev.some((item) => item.id === newItem.id)) return prev;
-          return [newItem, ...prev];
-        });
-      } catch (error) {
-        console.error("Ошибка обработки SSE:", error);
-      }
-    };
+  if (
+    lastMessage.type === "NEW_BOARD_ITEM" &&
+    lastMessage.eventId === eventId &&
+    lastMessage.item
+  ) {
+    const newItem = lastMessage.item;
+    setItems((prev) => {
+      if (prev.some((item) => item.id === newItem.id)) return prev;
+      return [newItem, ...prev];
+    });
 
-    return () => {
-      eventSource.close();
-    };
-  }, [eventId]);
+    markAsRead(eventId);
+  }
+}, [lastMessage, eventId, markAsRead]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

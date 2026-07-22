@@ -7,15 +7,21 @@ import { cn } from "@/lib/utils";
 
 interface BottomNavProps {
   unreadNotificationsCount?: number;
+  hasUnreadChats?: boolean;
 }
 
-function BottomNav({ unreadNotificationsCount = 0 }: BottomNavProps) {
+function BottomNav({ unreadNotificationsCount = 0, hasUnreadChats = false }: BottomNavProps) {
   const pathname = usePathname();
 
   const items = [
     { icon: Users, label: "Лента", href: "/" },
     { icon: Calendar, label: "События", href: "/events" },
-    { icon: MessageSquare, label: "Чаты", href: "/chats" },
+    { 
+      icon: MessageSquare, 
+      label: "Чаты", 
+      href: "/chats",
+      hasDot: hasUnreadChats
+    },
     { 
       icon: Bell, 
       label: "Уведомления", 
@@ -49,6 +55,10 @@ function BottomNav({ unreadNotificationsCount = 0 }: BottomNavProps) {
                   {(item.badgeCount ?? 0) > 9 ? "9+" : item.badgeCount}
                 </span>
               )}
+
+              {item.hasDot && (
+                <span className="absolute -top-0.5 -right-0.5 bg-pink-500 rounded-full h-2.5 w-2.5 border-2 border-white animate-pulse" />
+              )}
             </div>
           </Link>
         );
@@ -57,6 +67,4 @@ function BottomNav({ unreadNotificationsCount = 0 }: BottomNavProps) {
   );
 }
 
-export{
-  BottomNav
-}
+export { BottomNav };

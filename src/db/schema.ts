@@ -57,6 +57,7 @@ const eventApplications = pgTable("event_applications", {
   eventId: uuid("event_id").references(() => events.id).notNull(),
   userId: uuid("user_id").references(() => users.id).notNull(),
   status: text("status").default("pending").notNull(), 
+  lastBoardReadAt: timestamp("last_board_read_at"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
@@ -139,6 +140,7 @@ const eventRelations = relations(events, ({ one, many }) => ({
     references: [users.id],
   }),
   applications: many(eventApplications),
+  boardItems: many(eventBoardItems),
 }));
 
 const eventApplicationRelations = relations(eventApplications, ({ one }) => ({

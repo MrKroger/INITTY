@@ -3,8 +3,8 @@ import { chatParticipants } from "@/db/schema";
 import { getSession } from "@/lib/auth";
 import { UserAvatar } from "@/components/UserAvatar";
 import { eq, ne } from "drizzle-orm";
-import { Users, MessageSquare } from "lucide-react";
 import Link from "next/link";
+import { GroupChatItem } from "@/components/GroupChatItem";
 
 async function ChatsPage() {
   const session = await getSession();
@@ -19,11 +19,22 @@ async function ChatsPage() {
             where: ne(chatParticipants.userId, session.id),
             with: { 
               user: {
-                with: {avatar: true}
+                with: { avatar: true }
               }
             }
           },
-          event: true,
+          event: {
+            with: {
+              boardItems: {
+                orderBy: (items, { desc }) => [desc(items.createdAt)],
+                limit: 1,
+              },
+              applications: {
+                where: (apps, { eq }) => eq(apps.userId, session.id),
+                limit: 1,
+              },
+            }
+          },
         }
       }
     }
@@ -61,15 +72,31 @@ async function ChatsPage() {
         <div className="border-t p-4">
           <h2 className="text-xs font-bold text-gray-400 uppercase mb-4">Группы событий</h2>
           <div className="space-y-2">
-            {groups.map(c => (
-              <Link key={c.chat.id} href={`/events/${c.chat.eventId}/board`} className="flex items-center gap-4 p-4 bg-gray-50 rounded-2xl hover:bg-pink-50 transition-colors">
-                <div className="w-12 h-12 rounded-xl bg-pink-100 flex items-center justify-center text-pink-500"><Users size={24} /></div>
-                <div className="flex-1">
-                  <h3 className="font-bold text-sm">{c.chat.event?.title}</h3>
-                  <p className="text-[10px] text-gray-500">Нажмите, чтобы открыть доску</p>
-                </div>
-              </Link>
-            ))}
+            {groups.map(c => {
+              const event = c.chat.event;
+              if (!event) return null;
+
+              const latestBoardItem = event?.boardItems?.[0];
+              const application = event?.applications?.[0];
+              const isAuthorOfLatest = latestBoardItem?.creatorId === session.id;
+
+              const hasUnread = Boolean(
+                latestBoardItem &&
+                  !isAuthorOfLatest &&
+                  (!application?.lastBoardReadAt ||
+                    new Date(latestBoardItem.createdAt) > new Date(application.lastBoardReadAt))
+              );
+              
+              return (
+                <GroupChatItem
+                  key={c.chat.id}
+                  chatId={c.chat.id}
+                  eventId={c.chat.eventId!}
+                  eventTitle={event.title}
+                  initialHasUnread={hasUnread}
+                />
+              );
+            })}
           </div>
         </div>
       </div>
