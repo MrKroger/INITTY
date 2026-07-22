@@ -3,6 +3,7 @@
 import { db } from "@/db";
 import { events } from "@/db/schema";
 import { getSession } from "@/lib/auth";
+import { eventEmitter } from "@/lib/events-bus";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
@@ -65,13 +66,14 @@ async function createEvent(prevState: ActionState | null, formData: FormData): P
   }
 
   try {
-    await db.insert(events).values({
+    const [newEvent] = await db.insert(events).values({
       creatorId: session.id,
       title,
       description,
       type,
       tags: formattedTags,
-    });
+    }).returning();
+
   } catch (dbError) {
     console.error("Ошибка при записи события в БД:", dbError);
     return { error: "Не удалось сохранить событие в базу данных. Попробуйте позже." };

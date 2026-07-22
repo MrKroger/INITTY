@@ -1,11 +1,9 @@
 "use server";
 
 import { db } from "@/db";
-import { 
-  events, 
-  eventBoardItems 
-} from "@/db/schema";
+import { events, eventBoardItems } from "@/db/schema";
 import { getSession } from "@/lib/auth";
+import { eventEmitter } from "@/lib/events-bus";
 import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 
@@ -21,15 +19,20 @@ async function addBoardItem(eventId: string, content: string) {
     throw new Error("Только создатель может писать на доске");
   }
 
-  await db.insert(eventBoardItems).values({
-    eventId,
-    creatorId: session.id,
-    content,
-  });
+  const [newItem] = await db
+    .insert(eventBoardItems)
+    .values({
+      eventId,
+      creatorId: session.id,
+      content,
+    })
+    .returning();
+
+  eventEmitter.emit(`board:${eventId}`, newItem);
 
   revalidatePath(`/events/${eventId}/board`);
+
+  return newItem;
 }
 
-export{
-  addBoardItem
-}
+export { addBoardItem };

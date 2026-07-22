@@ -34,6 +34,7 @@ async function MainLayout({
 
   return (
     <div className="min-h-screen bg-gray-50 pb-20 text-black">
+
       <main className="max-w-md mx-auto min-h-screen bg-white shadow-xl relative overflow-hidden">
         {children}
       </main>

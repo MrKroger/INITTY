@@ -3,11 +3,11 @@ import { eventBoardItems, events, chats } from "@/db/schema";
 import { getSession } from "@/lib/auth";
 import { eq, desc } from "drizzle-orm";
 import { notFound, redirect } from "next/navigation";
-import { ArrowLeft, MessageCircle, Send } from "lucide-react";
+import { ArrowLeft, MessageCircle } from "lucide-react";
 import Link from "next/link";
-import { addBoardItem } from "@/lib/actions/addBoardItem";
+import { EventBoardClient } from "@/components/EventBoardClient";
 
-async function EventBoardPage({ params }: { params: { id: string } }) {
+async function EventBoardPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const session = await getSession();
   if (!session) redirect("/login");
@@ -43,26 +43,12 @@ async function EventBoardPage({ params }: { params: { id: string } }) {
         )}
       </header>
 
-      <div className="p-4 space-y-4 overflow-y-auto flex-1 pb-24">
-        {isCreator && (
-          <form action={async (fd) => { "use server"; await addBoardItem(id, fd.get("content") as string); }} className="bg-white p-4 rounded-2xl border-2 border-pink-100 space-y-2">
-            <textarea name="content" placeholder="Важное объявление..." className="w-full p-3 text-sm bg-gray-50 rounded-xl resize-none outline-none focus:ring-1 ring-pink-500" rows={3} required />
-            <button className="w-full py-2 bg-pink-500 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-2"><Send size={14} /> Опубликовать</button>
-          </form>
-        )}
-        <div className="space-y-4">
-          {boardItems.map((item) => (
-            <div key={item.id} className="bg-white p-5 rounded-2xl border border-gray-100 relative shadow-sm">
-              <div className="absolute top-0 left-0 w-1.5 h-full bg-pink-500" />
-              <p className="text-sm text-gray-800 leading-relaxed">{item.content}</p>
-              <div className="mt-4 text-[9px] text-gray-400 font-bold flex justify-between uppercase">
-                <span>{event.creator.name}</span>
-                <span>{new Date(item.createdAt).toLocaleDateString()}</span>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
+      <EventBoardClient
+        eventId={id}
+        initialItems={boardItems}
+        isCreator={isCreator}
+        creatorName={event.creator.name}
+      />
     </div>
   );
 }
