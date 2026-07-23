@@ -59,7 +59,7 @@ async function MainLayout({ children }: { children: React.ReactNode }) {
   return (
     <SSEProvider initialUnreadEventIds={initialUnreadEventIds} userId={session.id}>
       <div className="min-h-screen bg-gray-50 pb-20 text-black">
-        <main className="max-w-md mx-auto min-h-screen bg-white shadow-xl relative overflow-hidden">
+        <main className="max-w-md mx-auto min-h-screen bg-white shadow-xl relative">
           {children}
         </main>
         <BottomNavWrapper unreadNotificationsCount={result?.value || 0} />

@@ -29,13 +29,13 @@ function EventBoardClient({
   const [content, setContent] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const { lastMessage, markAsRead } = useSSE();
+  const { lastMessage, markEventAsRead} = useSSE();
 
   useEffect(() => {
   if (eventId) {
-    markAsRead(eventId);
+    markEventAsRead(eventId);
   }
-}, [eventId, markAsRead]);
+}, [eventId, markEventAsRead]);
 
 useEffect(() => {
   if (!lastMessage) return;
@@ -51,9 +51,9 @@ useEffect(() => {
       return [newItem, ...prev];
     });
 
-    markAsRead(eventId);
+    markEventAsRead(eventId);
   }
-}, [lastMessage, eventId, markAsRead]);
+}, [lastMessage, eventId, markEventAsRead]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

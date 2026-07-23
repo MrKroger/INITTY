@@ -1,55 +1,58 @@
 "use client";
 
-import React, { createContext, useContext, useEffect, useState, useCallback } from "react";
-
-interface SSEMessage {
-  type: "NEW_BOARD_ITEM";
-  eventId: string;
-  creatorId?: string;
-  item?: any;
-}
+import React, { createContext, useContext, useEffect, useState } from "react";
 
 interface SSEContextType {
-  lastMessage: SSEMessage | null;
   unreadEventIds: string[];
-  markAsRead: (eventId: string) => void;
   hasUnreadChats: boolean;
+  lastMessage: any;
+  markEventAsRead: (eventId: string) => void;
+  clearUnreadChats: () => void;
 }
 
 const SSEContext = createContext<SSEContextType>({
-  lastMessage: null,
   unreadEventIds: [],
-  markAsRead: () => {},
   hasUnreadChats: false,
+  lastMessage: null,
+  markEventAsRead: () => {},
+  clearUnreadChats: () => {},
 });
 
 export function SSEProvider({
   children,
-  initialUnreadEventIds,
+  initialUnreadEventIds = [],
   userId,
 }: {
   children: React.ReactNode;
-  initialUnreadEventIds: string[];
+  initialUnreadEventIds?: string[];
   userId: string;
 }) {
   const [unreadEventIds, setUnreadEventIds] = useState<string[]>(initialUnreadEventIds);
-  const [lastMessage, setLastMessage] = useState<SSEMessage | null>(null);
+  const [hasUnreadChats, setHasUnreadChats] = useState<boolean>(initialUnreadEventIds.length > 0);
+  const [lastMessage, setLastMessage] = useState<any>(null);
 
   useEffect(() => {
-    const eventSource = new EventSource("/api/sse");
+    if (!userId) return;
+
+    const eventSource = new EventSource(`/api/sse?userId=${userId}`);
 
     eventSource.onmessage = (event) => {
       try {
-        const data: SSEMessage = JSON.parse(event.data);
+        const data = JSON.parse(event.data);
         setLastMessage(data);
 
-        if (data.type === "NEW_BOARD_ITEM" && data.creatorId !== userId) {
-          setUnreadEventIds((prev) => 
-            prev.includes(data.eventId) ? prev : [...prev, data.eventId]
-          );
+        if (data.type === "NEW_BOARD_ITEM" && data.eventId) {
+          setUnreadEventIds((prev) => [...new Set([...prev, data.eventId])]);
+          setHasUnreadChats(true);
+        }
+
+        if (data.type === "NEW_CHAT_MESSAGE") {
+          if (data.message?.senderId !== userId) {
+            setHasUnreadChats(true);
+          }
         }
       } catch (err) {
-        console.error("SSE Error:", err);
+        console.error("Ошибка парсинга SSE:", err);
       }
     };
 
@@ -58,17 +61,28 @@ export function SSEProvider({
     };
   }, [userId]);
 
-  const markAsRead = useCallback((eventId: string) => {
+  const markEventAsRead = (eventId: string) => {
     setUnreadEventIds((prev) => {
-      if (!prev.includes(eventId)) return prev;
-      return prev.filter((id) => id !== eventId);
+      const next = prev.filter((id) => id !== eventId);
+      if (next.length === 0) setHasUnreadChats(false);
+      return next;
     });
-  }, []);
+  };
 
-  const hasUnreadChats = unreadEventIds.length > 0;
+  const clearUnreadChats = () => {
+    setHasUnreadChats(false);
+  };
 
   return (
-    <SSEContext.Provider value={{ lastMessage, unreadEventIds, markAsRead, hasUnreadChats }}>
+    <SSEContext.Provider
+      value={{
+        unreadEventIds,
+        hasUnreadChats,
+        lastMessage,
+        markEventAsRead,
+        clearUnreadChats,
+      }}
+    >
       {children}
     </SSEContext.Provider>
   );

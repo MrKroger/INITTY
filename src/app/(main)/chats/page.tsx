@@ -1,10 +1,11 @@
 import { db } from "@/db";
 import { chatParticipants } from "@/db/schema";
 import { getSession } from "@/lib/auth";
-import { UserAvatar } from "@/components/UserAvatar";
 import { eq, ne } from "drizzle-orm";
-import Link from "next/link";
 import { GroupChatItem } from "@/components/GroupChatItem";
+import { DirectChatItem } from "@/components/chat/DirectChatItem";
+
+export const dynamic = "force-dynamic";
 
 async function ChatsPage() {
   const session = await getSession();
@@ -15,6 +16,10 @@ async function ChatsPage() {
     with: {
       chat: {
         with: {
+          messages: {
+            orderBy: (msgs, { desc }) => [desc(msgs.createdAt)],
+            limit: 1,
+          },
           participants: { 
             where: ne(chatParticipants.userId, session.id),
             with: { 
@@ -45,8 +50,11 @@ async function ChatsPage() {
 
   return (
     <div className="flex flex-col h-full bg-white">
-      <header className="px-6 py-4 border-b"><h1 className="text-xl font-bold">Сообщения</h1></header>
+      <header className="px-6 py-4 border-b">
+        <h1 className="text-xl font-bold">Сообщения</h1>
+      </header>
       <div className="flex-1 overflow-y-auto pb-20">
+        
         <div className="p-4">
           <h2 className="text-xs font-bold text-gray-400 uppercase mb-4">Совпадения</h2>
           <div className="flex gap-4 overflow-x-auto pb-4 no-scrollbar">
@@ -54,21 +62,30 @@ async function ChatsPage() {
               const partner = c.chat.participants[0]?.user;
               if (!partner) return null;
 
-              return (
-                <Link key={c.chat.id} href={`/chats/${c.chat.id}`} className="flex flex-col items-center gap-1 min-w-[70px]">
-                  <UserAvatar 
-                    avatar={partner.avatar} 
-                    userId={partner.id} 
-                    userName={partner.name || "User"} 
-                    className="w-16 h-16"
-                    withBorder={true}
-                  />
-                  <span className="text-[10px] font-bold truncate w-full text-center">{partner.name}</span>
-                </Link>
+              const latestMessage = c.chat.messages?.[0];
+              const isUnread = Boolean(
+                latestMessage &&
+                latestMessage.senderId !== session.id &&
+                (!c.lastReadAt || new Date(latestMessage.createdAt) > new Date(c.lastReadAt))
               );
+
+              return (
+              <DirectChatItem
+                key={c.chat.id}
+                chatId={c.chat.id}
+                currentUserId={session.id} // 👈 Передаем id текущего юзера
+                partner={{
+                  id: partner.id,
+                  name: partner.name || "User",
+                  avatar: partner.avatar,
+                }}
+                initialIsUnread={isUnread}
+              />
+            );
             })}
           </div>
         </div>
+
         <div className="border-t p-4">
           <h2 className="text-xs font-bold text-gray-400 uppercase mb-4">Группы событий</h2>
           <div className="space-y-2">
@@ -99,6 +116,7 @@ async function ChatsPage() {
             })}
           </div>
         </div>
+
       </div>
     </div>
   );

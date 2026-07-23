@@ -72,7 +72,8 @@ const messages = pgTable("messages", {
   id: uuid("id").defaultRandom().primaryKey(),
   chatId: uuid("chat_id").references(() => chats.id).notNull(),
   senderId: uuid("sender_id").references(() => users.id).notNull(),
-  content: text("content").notNull(),
+  content: text("content"),
+  imageUrl: text("image_url"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
@@ -80,6 +81,7 @@ const chatParticipants = pgTable("chat_participants", {
   id: uuid("id").defaultRandom().primaryKey(),
   chatId: uuid("chat_id").references(() => chats.id).notNull(),
   userId: uuid("user_id").references(() => users.id).notNull(),
+  lastReadAt: timestamp("last_read_at"),
 });
 
 const notifications = pgTable("notifications", {

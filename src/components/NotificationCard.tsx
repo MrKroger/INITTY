@@ -1,9 +1,11 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Check, X as Close } from "lucide-react";
+import { Check, X as Close, Heart } from "lucide-react";
 import { markNotificationAsRead } from "@/lib/actions/markNotificationAsRead";
-import { handleEventApplication  } from "@/lib/actions/handleEventApplication";
+import { handleEventApplication } from "@/lib/actions/handleEventApplication";
+import { handleLikeResponse } from "@/lib/actions/handleLikeResponse"; // Экшен для обработки лайка
+import { UserAvatar } from "@/components/UserAvatar";
 
 interface NotificationCardProps {
   notification: {
@@ -12,8 +14,11 @@ interface NotificationCardProps {
     isRead: boolean;
     eventId: string | null;
     applicationStatus?: string | null;
+    fromUserId?: string | null;
     fromUser?: {
+      id?: string;
       name: string;
+      avatar?: any;
     } | null;
     event?: {
       title: string;
@@ -27,7 +32,7 @@ function NotificationCard({ notification }: NotificationCardProps) {
 
   const [statusAction, setStatusAction] = useState<"approved" | "rejected" | null>(
     notification.applicationStatus === "approved" || notification.applicationStatus === "rejected"
-      ? notification.applicationStatus
+      ? (notification.applicationStatus as "approved" | "rejected")
       : null
   );
 
@@ -72,24 +77,41 @@ function NotificationCard({ notification }: NotificationCardProps) {
         notification.isRead ? "bg-white" : "bg-pink-50/40 font-medium"
       }`}
     >
-      <div className="text-sm text-gray-800 flex-1">
-        {notification.type === "join_request" && (
-          <p>
-            <span className="font-bold">{fromUserName}</span> хочет вступить в ваше событие{" "}
-            <span className="font-semibold text-pink-600">«{notification.event?.title || "Без названия"}»</span>
-          </p>
+      <div className="flex items-center gap-3 flex-1 min-w-0">
+        {notification.fromUser && (
+          <UserAvatar
+            avatar={notification.fromUser.avatar}
+            userId={notification.fromUser.id || notification.fromUserId || ""}
+            userName={fromUserName}
+            className="w-10 h-10 shrink-0"
+          />
         )}
 
-        {notification.type === "new_member" && (
-          <p>
-            <span className="font-bold">{fromUserName}</span> присоединился к вашему событию{" "}
-            <span className="font-semibold text-pink-600">«{notification.event?.title || "Без названия"}»</span>
-          </p>
-        )}
+        <div className="text-sm text-gray-800 min-w-0">
+          {(notification.type === "LIKE" || notification.type === "like") && (
+            <p className="leading-snug">
+              <span className="font-bold">{fromUserName}</span> хочет познакомиться
+            </p>
+          )}
 
-        {notification.type === "join_accepted" && (
-          <p>Ваша заявка на событие была одобрена! 🎉</p>
-        )}
+          {notification.type === "join_request" && (
+            <p>
+              <span className="font-bold">{fromUserName}</span> хочет вступить в ваше событие{" "}
+              <span className="font-semibold text-pink-600">«{notification.event?.title || "Без названия"}»</span>
+            </p>
+          )}
+
+          {notification.type === "new_member" && (
+            <p>
+              <span className="font-bold">{fromUserName}</span> присоединился к вашему событию{" "}
+              <span className="font-semibold text-pink-600">«{notification.event?.title || "Без названия"}»</span>
+            </p>
+          )}
+
+          {notification.type === "join_accepted" && (
+            <p>Ваша заявка на событие была одобрена! 🎉</p>
+          )}
+        </div>
       </div>
 
       {notification.type === "join_request" && (
@@ -118,12 +140,59 @@ function NotificationCard({ notification }: NotificationCardProps) {
               </form>
             </>
           ) : statusAction === "approved" ? (
-            <span className="text-green-600 bg-green-50 px-2.5 py-1 rounded-md text-xs border border-green-200 animate-fade-in">
+            <span className="text-green-600 bg-green-50 px-2.5 py-1 rounded-md text-xs border border-green-200">
               Одобрена
             </span>
           ) : (
-            <span className="text-red-600 bg-red-50 px-2.5 py-1 rounded-md text-xs border border-red-200 animate-fade-in">
+            <span className="text-red-600 bg-red-50 px-2.5 py-1 rounded-md text-xs border border-red-200">
               Отклонена
+            </span>
+          )}
+        </div>
+      )}
+
+      {(notification.type === "LIKE" || notification.type === "like") && (
+        <div className="flex gap-2 shrink-0 text-sm font-semibold">
+          {statusAction === null ? (
+            <>
+              <form 
+                action={async () => { 
+                  setStatusAction("approved");
+                  if (notification.fromUserId) {
+                    await handleLikeResponse(notification.id, notification.fromUserId, "accept");
+                  }
+                }}
+              >
+                <button 
+                  type="submit" 
+                  title="Принять"
+                  className="p-2 bg-pink-500 hover:bg-pink-600 text-white rounded-full transition-colors cursor-pointer shadow-sm active:scale-95"
+                >
+                  <Heart size={15} className="fill-white" />
+                </button>
+              </form>
+              <form 
+                action={async () => { 
+                  setStatusAction("rejected");
+                  await handleLikeResponse(notification.id, notification.fromUserId || "", "decline");
+                }}
+              >
+                <button 
+                  type="submit" 
+                  title="Отклонить"
+                  className="p-2 bg-gray-100 hover:bg-gray-200 text-gray-500 rounded-full transition-colors cursor-pointer active:scale-95"
+                >
+                  <Close size={15} />
+                </button>
+              </form>
+            </>
+          ) : statusAction === "approved" ? (
+            <span className="text-pink-600 bg-pink-50 px-2.5 py-1 rounded-md text-xs border border-pink-200">
+              Взаимность!
+            </span>
+          ) : (
+            <span className="text-gray-500 bg-gray-50 px-2.5 py-1 rounded-md text-xs border border-gray-200">
+              Пропущено
             </span>
           )}
         </div>
@@ -132,6 +201,4 @@ function NotificationCard({ notification }: NotificationCardProps) {
   );
 }
 
-export{
-  NotificationCard
-}
+export { NotificationCard };
