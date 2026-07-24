@@ -1,6 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useEffect, useState } from "react";
+import { useCallback } from 'react';
 
 interface SSEContextType {
   unreadEventIds: string[];
@@ -61,13 +62,17 @@ export function SSEProvider({
     };
   }, [userId]);
 
-  const markEventAsRead = (eventId: string) => {
+  const markEventAsRead = useCallback((eventId: string) => {
     setUnreadEventIds((prev) => {
       const next = prev.filter((id) => id !== eventId);
-      if (next.length === 0) setHasUnreadChats(false);
+      
+      if (next.length === 0) {
+        queueMicrotask(() => setHasUnreadChats(false));
+      }
+      
       return next;
     });
-  };
+  }, []);
 
   const clearUnreadChats = () => {
     setHasUnreadChats(false);
